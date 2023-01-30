@@ -25,5 +25,11 @@ module.exports = class User {
         [this.Name,this.PhoneNumber,this.Country,this.Email,this.State,this.City,this.ZipCode,this.OTP,this.Designation]);
     }
 
+    static findByPhoneNumber( number ){
+
+        return db.execute(`SELECT OTP FROM users WHERE PhoneNumber = number` )
+        // number = number.toInt();
+    }
+
 
 }
