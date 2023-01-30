@@ -1,3 +1,15 @@
+// connecting db using sequelize
+
+// const Sequelize = require("sequelize");
+
+// const sequelize  = new Sequelize('users','localhost','saini168',{
+//     dialect :'mysql'
+// });
+
+// module.exports = sequelize;
+
+// console.log(sequelize);
+
 const mysql = require('mysql2');
 
 const pool = mysql.createPool({
@@ -7,4 +19,4 @@ const pool = mysql.createPool({
     database : 'users'
 })
 
-module.exports = pool.Promise();
+module.exports = pool.promise();
