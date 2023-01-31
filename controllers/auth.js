@@ -19,18 +19,27 @@ let code = Math.floor(100000 + Math.random() * 900000); // otp
         
     })
     .catch(err=>console.log(err));
-    //////// storing user data in db 
+    
+////// checking if user is verified  
 
+
+    // User.findByPhoneNumber(PhoneNumber)
+    // .then(([data,meta]) => {
+    //     console.log("data fetched from db")
+
+    // }
+
+
+//////// storing user data in db 
 const user = new User(null,req.body.Name,req.body.Email,req.body.PhoneNumber,req.body.Country,req.body.State,req.body.City,req.body.ZipCode,code,req.body.Designation);
-user.save().then(()=>{res.send("user added")}).catch(err=>console.log(err))
+user.save().then(()=>{console.log(" user added")}).catch(err=>console.log(err))
 
 // creating json web token 
 
 // since phone number is unique  we can send it in token 
   const token = jwt.sign({PhoneNumber:req.body.PhoneNumber},
-    'secret',{expiresIn:'1h'}
+    'secret',{expiresIn:'9h'}
     );
-
     res.status(200).json({token:token,email:req.body.Email,PhoneNumber:req.body.PhoneNumber})
 
 }
@@ -39,16 +48,40 @@ user.save().then(()=>{res.send("user added")}).catch(err=>console.log(err))
 
 exports.postVerify= (req,res)=>{
     const Token = req.body.Token;
-    // // console.log(req.body.Token);
-    // console.log(JSON.parse(atob(Token.split('.')[1])));
+    
 
     // decodedToken =
-    decodedToken = jwt.verify(Token,'secret').then(data=>{console.log(data)});
+    // decodedToken =
+    decodedToken = jwt.verify(Token,'secret');
+    // console.log(decodedToken);
+
     let otp = req.body.OTP;
     let PhoneNumber = decodedToken.PhoneNumber;
-    let db_otp = User.findByPhoneNumber(PhoneNumber);
+    // User.findByPhoneNumber(PhoneNumber);
+    // console.log(PhoneNumber);
 
-    // console.log(db_otp,otp);
+    User.findByPhoneNumber(PhoneNumber)
+    .then(([data,meta]) => {
+        console.log("data fetched from db")
+///   multiple login are possible by user fetch the latest one 
+
+        // console.log(data[data.length-1].OTP);
+        let db_otp = data[data.length-1].OTP;
+        if (db_otp === otp ){
+            console.log("user correct");
+        }
+        else {
+            console.log("unable to verify");
+            // can make multiple attempts 
+            // or delete record 
+        }
+
+    });
+   
+    // User.fetchAll()
+    // .then(([data,meta]) => console.log(data));
+
+    // console.log(result);
 
 
 }
