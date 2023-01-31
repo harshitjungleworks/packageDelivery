@@ -27,7 +27,7 @@ module.exports = class User {
 
     static findByPhoneNumber( number ){
 
-        return db.execute(`SELECT OTP FROM users WHERE PhoneNumber = number` )
+        return db.execute(`SELECT OTP FROM users WHERE PhoneNumber = ${number}` )
         // number = number.toInt();
     }
 
