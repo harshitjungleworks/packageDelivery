@@ -42,7 +42,11 @@ console.log(this.type,this.weight,this.length,this.breadth,this.picture,this.pic
         // number = number.toInt();
     }
 
-//     }
+//     UPDATE Customers
+// SET ContactName = 'Alfred Schmidt', City= 'Frankfurt'
+// WHERE CustomerID = 1;
 
-
+    static setStatus (c_status,order_id){
+        return db.execute(`UPDATE products SET c_status = "${c_status}" WHERE id=${order_id}`)
+    }
 }

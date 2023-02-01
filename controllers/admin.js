@@ -51,7 +51,21 @@ exports.getAllProductsList = (req,res)=>{
 
 }
 
-
+////// accept and reject possible
 exports.modifyProductStatus = (req,res)=>{
-    console.log("frevnenr");
+
+    let c_status = req.body.c_status;
+    let order_id = req.body.order_id;
+
+    //// reject case
+    if (c_status === 'reject'){
+        Product.setStatus(c_status ,order_id )
+        .then(()=>console.log("status updated"))
+        .catch(err => console.log(err))
+    }
+
+    else{
+
+    }
+    
 }
