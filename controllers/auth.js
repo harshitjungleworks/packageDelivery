@@ -84,17 +84,21 @@ exports.postVerify= (req,res)=>{
     // User.findByPhoneNumber(PhoneNumber);
     // console.log(PhoneNumber);
 
-    User.findByPhoneNumber(PhoneNumber)
+    User.getRecordByPhoneNumber(PhoneNumber)
     .then(([data,meta]) => {
-        console.log("data fetched from db")
+        // console.log("data fetched from db")
 ///   multiple login are possible by user fetch the latest one 
 
         
         let db_otp = data[data.length-1].OTP;
+        console.log(data);
+        let Designation = data[data.length-1].Designation;
+        
         if (db_otp === OTP ){
-            console.log("user correct");
-            // res.send()
-            
+            // console.log("user correct");
+            User.update_verify(PhoneNumber,Designation)
+            .then(console.log("user correct"))
+            .catch(err =>console.log(err));
         }
         else {
             console.log("unable to verify");

@@ -2,21 +2,18 @@ const express = require('express');
 require('dotenv').config();
 // const bodyParser = require('body-parser');
 const port = process.env.PORT||3000;
+
 const authRoutes = require('./routes/auth');
+const productRoutes = require('./routes/products');
+
 
 const app = express();
 
-
-// app.use(bodyParser.urlencoded({extended:false}));
-// app.use(bodyParser.json());
-
 app.use(express.json());
 
-
-
-// const sequelize = require('./util/database');
-
 app.use(authRoutes);
+app.use (productRoutes);
+
 
 
 // sequelize.sync().then(res =>{

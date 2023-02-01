@@ -31,5 +31,15 @@ module.exports = class User {
         // number = number.toInt();
     }
 
+    static update_verify(number,Designation){
+//         UPDATE Customers
+// SET ContactName = 'Alfred Schmidt', City = 'Frankfurt'
+// WHERE CustomerID = 1;
+        return db.execute(`UPDATE users SET Designation = 'VERIFIED ${Designation}' WHERE PhoneNumber = ${number}`)
+    }
+
+    static getRecordByPhoneNumber(number){
+        return db.execute(`SELECT * FROM users WHERE PhoneNumber = ${number}`)
+    }
 
 }
