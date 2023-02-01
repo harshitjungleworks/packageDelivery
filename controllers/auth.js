@@ -4,6 +4,7 @@ let client = new plivo.Client();
 const User = require('../models/user');
 const db = require('../util/database');
 const jwt = require('jsonwebtoken');
+const Driver = require('../models/drivers');
 
 exports.postSignup= (req,res)=>{
 
@@ -75,9 +76,9 @@ exports.postVerify= (req,res)=>{
             }
             catch (err){
                 err.statusCode = 500;
-                throw err;
+                res.send (err);
             }
-            console.log(decodedToken);
+            // console.log(decodedToken);
 
     
     let PhoneNumber = decodedToken.PhoneNumber;
@@ -91,16 +92,35 @@ exports.postVerify= (req,res)=>{
 
         
         let db_otp = data[data.length-1].OTP;
-        console.log(data);
+        // console.log(data);
         let Designation = data[data.length-1].Designation;
         
+        let user_id=data[data.length-1].id;
+
         if (db_otp === OTP ){
             // console.log("user correct");
             User.update_verify(PhoneNumber,Designation)
-            .then(console.log("user correct"))
-            .catch(err =>console.log(err));
+            .then(()=>{
+                res.status(200).send(`VERIFIED ${Designation} `);
+
+                if (  Designation === 'DRIVER' || Designation === 'VERIFIED DRIVER'){
+                    const driver = new Driver(user_id);
+                    // console.log('hereigdwv');
+                    driver.save()
+                    .then(()=>{console.log("driver added");})
+                    .catch(err=>console.log(err))
+                    // dont send second res
+                }
+            })
+            .catch(err =>res.send(err));
+
+            //// if driver add in driver table
+
+          
+
         }
         else {
+            res.status(400).send("WRONG OTP")
             console.log("unable to verify");
             // can make multiple attempts 
             // or delete record 

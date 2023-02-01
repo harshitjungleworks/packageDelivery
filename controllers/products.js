@@ -34,7 +34,8 @@ exports.addProduct= (req,res)=>{
 product.save()
 .then(result => console.log(result))
 .catch(err=>console.log(err));
-
+res.statusCode = 200;
+                  res.send('ORDER PLACED');
                 }
                 else {
                   res.statusCode = 400;
@@ -54,7 +55,7 @@ exports.getOrdersList = (req,res)=>{
 
    let token = req.headers.authorization;
    token = token.split(' ')[1];
-
+// console.log(token);
    let decodedToken;
    try{
       
@@ -77,7 +78,14 @@ exports.getOrdersList = (req,res)=>{
         let customer_id = data.id;
 
         Product.getRecordByCustomerId(customer_id)
-        .then(([data,metaData])=>console.log(data))
+        .then(([data,metaData])=>{
+         res.statusCode = 200;
+               res.send(data);
+        })
+        .catch(err=>{
+         res.statusCode = 400;
+               res.send('UNABLE TO FETCH DETAILS');
+        })
 
                 }
              })

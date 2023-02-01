@@ -5,14 +5,18 @@ const port = process.env.PORT||3000;
 
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
-
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 
 app.use(express.json());
 
+
+app.use ('/admin',adminRoutes);
 app.use(authRoutes);
 app.use (productRoutes);
+
+
 
 
 

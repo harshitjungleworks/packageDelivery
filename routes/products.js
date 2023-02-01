@@ -14,4 +14,3 @@ router.post('/add',productController.addProduct);
 router.get('/list',productController.getOrdersList);
 
 module.exports = router;
-
