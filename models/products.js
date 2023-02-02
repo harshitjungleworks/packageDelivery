@@ -55,8 +55,11 @@ console.log(this.type,this.weight,this.length,this.breadth,this.picture,this.pic
     }
 
     static setStatusById (c_status,driver_id){
-        console.log(`UPDATE products SET c_status = "${c_status}" WHERE id=${driver_id}`);
+        // console.log(`UPDATE products SET c_status = "${c_status}" WHERE id=${driver_id}`);
         return db.execute(`UPDATE products SET c_status = "${c_status}" WHERE driver_id=${driver_id}`);
     }
 
+    static setCost (cost,order_id){
+        return db.execute(`UPDATE products SET cost = ${cost} WHERE id=${order_id}`)
+    }
 }

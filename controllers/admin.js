@@ -139,9 +139,7 @@ console.log(decodedToken);
 
              // assigning driver 
             driverData.forEach(element => {
-          //1  goes to catch 
-               // console.log(JSON.parse(element.location));
-          //2  string becomes object 
+      
 
          //  console.log(element.location);
 
@@ -179,8 +177,11 @@ console.log(decodedToken);
                    
                   Product.setStatus ('OUT',order_id)
                   .then(()=>{
-                     // console.log('set product status');
-                     res.status(200).send("ORDER PLACED")
+                     let cost = 100 ;
+                     Product.setCost(cost,order_id)
+                     .then(()=>{res.status(200).send("ORDER PLACED")})
+                     .catch(()=>{res.status(400).send('UNABLE TO SET COST to db')})
+                     
                })
                   .catch(err=>console.log(err))
             }
@@ -199,8 +200,8 @@ console.log(decodedToken);
 
       })
       .catch((err)=>{
-         console.log('unable to reach dB');
-         res.status(400).json(err);
+         console.log('unable to reach dB  or not entered drivers location add manually');
+         res.status(400).send("unable to reach dB  or not entered drivers location add manually");
       })
     }
    
