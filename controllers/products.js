@@ -2,6 +2,7 @@ const db = require('../util/database');
 const jwt = require('jsonwebtoken');
 const Users = require('../models/user');
 const Product = require('../models/products');
+const Driver = require('../models/drivers');
 
 // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJQaG9uZU51bWJlciI6OTQxNzAwODUzOCwiaWF0IjoxNjc1MTYwMjQ0LCJleHAiOjE2NzUxOTI2NDR9.QMRrGi2Oimkf-B5K350Lb4a02n0kHXcivoBLHc6sbWU
 
@@ -94,6 +95,15 @@ exports.getOrdersList = (req,res)=>{
                res.send('UNABLE TO GET DETAILS');
              });
 
+}
+
+
+exports.getLocation = (req,res)=>{
+   let tracking_id = req.body.tracking_id;
+   // console.log(req.body.tracking_id);
+   Driver.getRecordByTrackingId(tracking_id)
+   .then(([data,md])=>{res.status(200).send(data);})
+   .catch(err=>log(err));
 }
 
 

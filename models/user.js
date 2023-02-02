@@ -42,4 +42,6 @@ module.exports = class User {
         return db.execute(`SELECT * FROM users WHERE PhoneNumber = ${number}`)
     }
 
+    
+
 }

@@ -24,4 +24,8 @@ module.exports = class Driver {
         // console.log(`UPDATE drivers SET status = "${c_status}" WHERE id=${tracking_id}`);
         return db.execute(`UPDATE drivers SET status = "${c_status}" WHERE id=${driver_id}`)
     }
+
+    static getRecordByTrackingId(tracking_id){
+        return db.execute(`SELECT * FROM drivers WHERE tracking_id=${tracking_id}`)
+    }
     }

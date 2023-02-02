@@ -57,13 +57,42 @@ exports.getAllProductsList = (req,res)=>{
 function getDistance(x1, y1, x2, y2){
    let y = x2 - x1;
    let x = y2 - y1;
-   // console.log(Math.sqrt(x * x + y * y));
+   console.log(Math.sqrt(x * x + y * y));
    return Math.sqrt(x * x + y * y);
 }
 
 
 ////// accept and reject possible
+
+///// SET COST 
+
+/// send token in body also 
+
+
 exports.modifyProductStatus = (req,res)=>{
+
+   let token = req.body.token;
+// console.log(token);
+   let decodedToken;
+   try{
+      
+      decodedToken = jwt.verify(token,'secret');
+   }
+      catch (err){
+            res.statusCode = 400;
+            res.send(err);
+         }
+console.log(decodedToken);
+      let phone_number = decodedToken.PhoneNumber;
+      // console.log(phone_number);
+// log
+  
+   User.getRecordByPhoneNumber(phone_number)
+   .then(  ([data,metaData])=>{
+      data = data[data.length-1]; // getting object 
+      console.log(data);
+      if (data.Designation === 'VERIFIED ADMIN'){
+
 
     let c_status = req.body.c_status;
     let order_id = req.body.order_id;
@@ -84,7 +113,7 @@ exports.modifyProductStatus = (req,res)=>{
     else{
       // check if free  deivers 
       Driver.getFreeDrivers()
-      .then(([driverData,md])=>{
+      .then( ([driverData,md])=>{
          console.log(driverData);
 
          if (driverData.length === 0){
@@ -106,13 +135,7 @@ exports.modifyProductStatus = (req,res)=>{
             let distance =Number.MAX_VALUE;
 
 
-            // driverData.array.forEach(element => {
-            //   let  x2 = JSON.parse(element.location).lat;
-            //    let y2 = JSON.parse(element.location).long;
-            //    distance = Math.min(getDistance(x1,y1,x2,y2),distance)
-            // });
-
-            // console.log();
+//          
 
              // assigning driver 
             driverData.forEach(element => {
@@ -127,25 +150,26 @@ exports.modifyProductStatus = (req,res)=>{
                let  x2 = c.lat;
                let y2 = c.long;
                // console.log(x2,y2);
+               ////// let distance - 
                if (distance > getDistance(x1,y1,x2,y2) ){
                   distance = getDistance(x1,y1,x2,y2);
                   driver_id = element.id;
                }
              });
-            // console.log(driver_id);
+            console.log(driver_id);
 
            
 
-      // generate tracking id 
+//       // generate tracking id 
       let tracking_id = Math.floor(Math.random() * 1000000000);
 
 
- /// set in product table 
+//  /// set in product table 
            Product.setIds(tracking_id,driver_id,order_id)
            .then(()=>console.log("product table update"))
            .catch(err=>console.log(err));
 
-//// set in driver table 
+// //// set in driver table 
             
              Driver.setTrackingId(tracking_id,driver_id)
              .then(()=>{
@@ -174,10 +198,21 @@ exports.modifyProductStatus = (req,res)=>{
          }
 
       })
-      .catch(err=>{
+      .catch((err)=>{
          console.log('unable to reach dB');
          res.status(400).json(err);
       })
     }
-    
+   
+      }
+      else {
+         res.status(400).send('admin not verified');
+      }
+   })
+      .catch((err)=>{res.status(400).send('UNABLE TO FIND RECORD IN DB')
+   console.log(err);
+   })
+ 
 }
+
+
