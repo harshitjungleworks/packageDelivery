@@ -49,4 +49,8 @@ console.log(this.type,this.weight,this.length,this.breadth,this.picture,this.pic
     static setStatus (c_status,order_id){
         return db.execute(`UPDATE products SET c_status = "${c_status}" WHERE id=${order_id}`)
     }
+
+    static setIds(tracking_id,driver_id,order_id){
+        return db.execute(`UPDATE products SET  tracking_id = "${tracking_id}",driver_id = "${driver_id}" WHERE id=${order_id}`)
+    }
 }

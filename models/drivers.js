@@ -10,4 +10,18 @@ module.exports = class Driver {
         // console.log('herer');
         return db.execute(`INSERT INTO drivers (id) VALUES ('${this.id}')`)
     }
+
+    static getFreeDrivers(){
+        return db.execute(`SELECT * FROM drivers WHERE status="free"`);
+    }
+    // UPDATE products ,driver_id = "${driver_id}" WHERE id=${order_id}
+    static setTrackingId(tracking_id,driver_id){
+        return db.execute(`UPDATE drivers SET  tracking_id = "${tracking_id}" WHERE id=${driver_id}`)
+    }
+
+    static setStatus (c_status,driver_id){
+        console.log(driver_id);
+        // console.log(`UPDATE drivers SET status = "${c_status}" WHERE id=${tracking_id}`);
+        return db.execute(`UPDATE drivers SET status = "${c_status}" WHERE id=${driver_id}`)
+    }
     }
