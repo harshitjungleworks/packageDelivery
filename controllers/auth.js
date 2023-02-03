@@ -131,5 +131,14 @@ exports.postVerify= (req,res)=>{
 
 }
 
+/// designation verified user 
 
+exports.postLogin = (req , res)=>{
+    let user_id=  req.body.id;
+    let password = req.body.password;
 
+    User.check(user_id,password)
+    .then(()=>{res.status(200).send('LOGGED IN')})
+    .catch(err => console.log(err))
+    ;
+}

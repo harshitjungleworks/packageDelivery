@@ -42,6 +42,8 @@ module.exports = class User {
         return db.execute(`SELECT * FROM users WHERE PhoneNumber = ${number}`)
     }
 
-    
+    static check(user_id,password){
+        return db.execute(`UPDATE users SET Designation = 'VERIFIED ${Designation}' WHERE id = ${user_id} AND password=${password}`)
+    }
 
 }

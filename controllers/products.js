@@ -106,5 +106,26 @@ exports.getLocation = (req,res)=>{
    .catch(err=>log(err));
 }
 
+/// user enters tracking id and the feedback points 
+exports.postFeedback = (req,res)=>{
+   let tracking_id = req.body.tracking_id;
+   let points = req.body.points;
+
+   // check if order c_staus - > completed
+
+   Product.getRecordByTrackingId(tracking_id).then(([Pdata,md])=>{
+      Pdata = Pdata[Pdata.length-1]
+      console.log(Pdata);
+      if(Pdata.c_status === 'completed'){
+         Product.setPoints(tracking_id,points)
+         .then(([data,md])=>{res.status(200).send('Feedback done');})
+         .catch(err=>log(err));
+      } 
+      else{
+         res.send("order not completed")
+      }
+   }).catch((err)=>res.status(400).send(err))
+
+}
 
 

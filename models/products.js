@@ -62,4 +62,11 @@ console.log(this.type,this.weight,this.length,this.breadth,this.picture,this.pic
     static setCost (cost,order_id){
         return db.execute(`UPDATE products SET cost = ${cost} WHERE id=${order_id}`)
     }
+
+    static setPoints(tracking_id,points){
+        return db.execute(`UPDATE products SET review = ${points} WHERE tracking_id=${tracking_id}`)
+    }
+    static getRecordByTrackingId(tracking_id){
+        return db.execute(`SELECT * FROM products WHERE tracking_id = ${tracking_id}`)
+    }
 }

@@ -19,4 +19,9 @@ router.get('/list',productController.getOrdersList);
 router.post('/location',productController.getLocation);
 
 
+// /feedback 
+router.post('/feedback',productController.postFeedback);
+
+
+
 module.exports = router;
