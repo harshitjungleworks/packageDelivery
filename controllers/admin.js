@@ -6,6 +6,7 @@ const Product = require('../models/products');
 const Driver = require('../models/drivers');
 const { LOADIPHLPAPI } = require('dns');
 
+// var instance = new Razorpay({ key_id: 'YOUR_KEY_ID', key_secret: 'YOUR_SECRET' })
 
 exports.getAllProductsList = (req,res)=>{
     let token = req.headers.authorization;
@@ -18,9 +19,9 @@ exports.getAllProductsList = (req,res)=>{
     }
        catch (err){
              res.statusCode = 400;
-             res.send(err);
+             res.send(`unable to decode token or ${err}`);
           }
- 
+//  console.log(decodedToken);
        let phone_number = decodedToken.PhoneNumber;
     //    console.log(phone_number);
  
@@ -43,6 +44,9 @@ exports.getAllProductsList = (req,res)=>{
                 /// cant get orders list 
          })
  
+                 }
+                 else {
+                  res.send('NOT A VERIFIED ADMIN')
                  }
               })
               .catch(err=>{
@@ -80,9 +84,9 @@ exports.modifyProductStatus = (req,res)=>{
    }
       catch (err){
             res.statusCode = 400;
-            res.send(err);
+            res.send(`unable to decode token or ${err}`);
          }
-console.log(decodedToken);
+// console.log(decodedToken);
       let phone_number = decodedToken.PhoneNumber;
       // console.log(phone_number);
 // log
@@ -110,7 +114,7 @@ console.log(decodedToken);
 
     // if "status is not reject "  ===> accept
 
-    else{
+    if (c_status === 'accept'){
       // check if free  deivers 
       Driver.getFreeDrivers()
       .then( ([driverData,md])=>{
@@ -165,7 +169,7 @@ console.log(decodedToken);
 //  /// set in product table 
            Product.setIds(tracking_id,driver_id,order_id)
            .then(()=>console.log("product table update"))
-           .catch(err=>console.log(err));
+           .catch(err=>res.send(`unable to update products db${err}`));
 
 // //// set in driver table 
             
@@ -186,10 +190,10 @@ console.log(decodedToken);
                   .catch(err=>console.log(err))
             }
                )
-               .catch(err=>console.log(err))
+               .catch(err=>res.send(`unable to update drivers status db${err}`))
             
             })
-             .catch(err=>console.log(err));
+             .catch(err=>res.send(`unable to update drivers db${err}`));
 
       // update order status and driver status 
 
@@ -210,10 +214,92 @@ console.log(decodedToken);
          res.status(400).send('admin not verified');
       }
    })
-      .catch((err)=>{res.status(400).send('UNABLE TO FIND RECORD IN DB')
-   console.log(err);
+      .catch((err)=>{res.status(400).send(`UNABLE TO FIND RECORD IN DB${err}`)
+   // console.log(err);
    })
  
 }
 
+// verify if admin 
+// check status - > payment pending 
+// genrate link 
+
+exports.generateLink = (req,res)=>{
+
+   // console.log(req.body.order_id);
+   // console.log(req.body.token);
+   let token = req.body.token;
+   let order_id = req.body.order_id;
+
+   let decodedToken;
+   try{
+      
+      decodedToken = jwt.verify(token,'secret');
+   }
+      catch (err){
+            res.statusCode = 400;
+            res.send(err);
+         }
+
+      let phone_number = decodedToken.PhoneNumber;
+   //    console.log(phone_number);
+
+      User.getRecordByPhoneNumber(phone_number)
+             .then(([data,metaData])=>{
+                data = data[data.length-1]; // getting object 
+                if (data.Designation === 'VERIFIED ADMIN'){
+                  // console.log("iberiov");
+                  Product.getRecordByOrderId(order_id)
+                  .then(([data,md])=>{
+                     // console.log(data);
+                     // console.log(data.c_status);
+                     if (data[0].c_status == 'payment pending'){
+                        console.log('generating payment limk.....');
+
+                        // instance.paymentLink.create({
+                        //    amount: data.cost,
+                        //    currency: "INR",
+                        //    description: "payment of order delivery",
+                        //    customer: {
+                        //      name: data.id,
+                        //      contact: data.alternate_phone_number
+                        //    },
+                        //    notify: {
+                        //      sms: true,
+                        //    //   email: true
+                        //    },
+                        //    reminder_enable: true,
+                        //    notes: {
+                        //      policy_name: "Jeevan Bima"
+                        //    },
+                        //    callback_url: "https://example-callback-url.com/",
+                        //    callback_method: "get"
+                        //  })
+
+
+
+
+
+
+
+
+
+                     }
+
+                     else {
+                        res.send("check order status");
+                     }
+                     
+
+
+                  })
+                  .catch((err)=>{
+                     res.send(`unable to verify admin or ${err}`);
+                  })
+                }
+               })
+               .catch((err)=> res.send(`unable to verify admin or ${err}`));
+
+
+}
 

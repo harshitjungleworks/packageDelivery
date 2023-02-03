@@ -8,4 +8,9 @@ router.get('/list',adminController.getAllProductsList);
 
 router.post('/modify',adminController.modifyProductStatus);
 
+// /admin/generate 
+/// generates paymnet link 
+
+router.post('/payment',adminController.generateLink)
+
 module.exports = router;

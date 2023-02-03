@@ -56,7 +56,7 @@ console.log(this.type,this.weight,this.length,this.breadth,this.picture,this.pic
 
     static setStatusById (c_status,driver_id){
         // console.log(`UPDATE products SET c_status = "${c_status}" WHERE id=${driver_id}`);
-        return db.execute(`UPDATE products SET c_status = "${c_status}" WHERE driver_id=${driver_id}`);
+        return db.execute(`UPDATE products SET c_status = "${c_status}" WHERE driver_id=${driver_id} AND c_status = 'OUT'`);
     }
 
     static setCost (cost,order_id){
@@ -68,5 +68,13 @@ console.log(this.type,this.weight,this.length,this.breadth,this.picture,this.pic
     }
     static getRecordByTrackingId(tracking_id){
         return db.execute(`SELECT * FROM products WHERE tracking_id = ${tracking_id}`)
+    }
+
+    static getRecordByOrderId(order_id){
+        return db.execute(`SELECT * FROM products WHERE id = ${order_id}`)
+    }
+
+    static getRecordByDriverId(driver_id){
+        return db.execute(`SELECT * FROM products WHERE driver_id = ${driver_id} AND c_status = 'OUT'`)
     }
 }

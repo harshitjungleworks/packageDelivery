@@ -4,6 +4,11 @@ const Users = require('../models/user');
 const Product = require('../models/products');
 const Driver = require('../models/drivers');
 
+
+
+let plivo = require('plivo');
+let client = new plivo.Client();
+
 // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJQaG9uZU51bWJlciI6OTQxNzAwODUzOCwiaWF0IjoxNjc1MTYwMjQ0LCJleHAiOjE2NzUxOTI2NDR9.QMRrGi2Oimkf-B5K350Lb4a02n0kHXcivoBLHc6sbWU
 
 exports.addProduct= (req,res)=>{
@@ -33,10 +38,12 @@ exports.addProduct= (req,res)=>{
 // console.log(null,req.body.type,req.body.weight,req.body.length,req.body.breadth,req.body.picture,req.body.pickup_address,req.body.drop_address,req.body.alternate_phone_number,status,customer_id);
    const product = new Product(null,req.body.type,req.body.weight,req.body.length,req.body.breadth,req.body.picture,req.body.pickup_address,req.body.drop_address,req.body.alternate_phone_number,status,customer_id);
 product.save()
-.then(result => console.log(result))
+.then(()=>{result => console.log(result)
+   res.statusCode = 200;
+   res.send('ORDER PLACED');
+})
 .catch(err=>console.log(err));
-res.statusCode = 200;
-                  res.send('ORDER PLACED');
+
                 }
                 else {
                   res.statusCode = 400;
@@ -107,6 +114,7 @@ exports.getLocation = (req,res)=>{
 }
 
 /// user enters tracking id and the feedback points 
+// get a thankyou message 
 exports.postFeedback = (req,res)=>{
    let tracking_id = req.body.tracking_id;
    let points = req.body.points;
@@ -114,17 +122,35 @@ exports.postFeedback = (req,res)=>{
    // check if order c_staus - > completed
 
    Product.getRecordByTrackingId(tracking_id).then(([Pdata,md])=>{
+   
       Pdata = Pdata[Pdata.length-1]
-      console.log(Pdata);
+      let phone = Pdata.alternate_phone_number;
+      // console.log(Pdata);
       if(Pdata.c_status === 'completed'){
          Product.setPoints(tracking_id,points)
-         .then(([data,md])=>{res.status(200).send('Feedback done');})
+         .then(([data,md])=>{
+
+            client.messages.create({
+               src: '+919877319473',
+               dst: "+91"+`${phone}`,
+               text: `THANKS FOR USING OUR SERVICE`
+           }
+         ).then(function(message_created) {
+           console.log(message_created)
+           
+         })
+         .catch(err=>console.log(err));
+            
+            res.status(200).send('Feedback done');})
          .catch(err=>log(err));
       } 
       else{
          res.send("order not completed")
       }
-   }).catch((err)=>res.status(400).send(err))
+   }).catch((err)=>res.status(400).send(`order staus should be completed {err}`))
+
+ 
+   
 
 }
 
