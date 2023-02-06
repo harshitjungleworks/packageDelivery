@@ -5,8 +5,9 @@ const jwt = require('jsonwebtoken');
 const Product = require('../models/products');
 const Driver = require('../models/drivers');
 const { LOADIPHLPAPI } = require('dns');
+let  SK = "sk_test_51MXNOPSCt2duW6ZAJkbJ42iyqrhZbj7gIvQyjN2pVLh7gvbAXXyigOungR0fHwSstjNKTY83Xpi8IJNxT5DbGtsk00x8m9VWh9"
+const stripe = require('stripe')(SK);
 
-// var instance = new Razorpay({ key_id: 'YOUR_KEY_ID', key_secret: 'YOUR_SECRET' })
 
 exports.getAllProductsList = (req,res)=>{
     let token = req.headers.authorization;
@@ -245,52 +246,45 @@ exports.generateLink = (req,res)=>{
    //    console.log(phone_number);
 
       User.getRecordByPhoneNumber(phone_number)
-             .then(([data,metaData])=>{
-                data = data[data.length-1]; // getting object 
-                if (data.Designation === 'VERIFIED ADMIN'){
+             .then(([info,metaData])=>{
+                info = info[info.length-1]; // getting object 
+               //  console.log(info);
+                if (info.Designation === 'VERIFIED ADMIN'){
                   // console.log("iberiov");
                   Product.getRecordByOrderId(order_id)
                   .then(([data,md])=>{
+                     data = data[0];
                      // console.log(data);
                      // console.log(data.c_status);
-                     if (data[0].c_status == 'payment pending'){
-                        console.log('generating payment limk.....');
+                     if (data.c_status == 'payment pending'){
+                        // console.log('generating payment limk.....');
 
-                        // instance.paymentLink.create({
-                        //    amount: data.cost,
-                        //    currency: "INR",
-                        //    description: "payment of order delivery",
-                        //    customer: {
-                        //      name: data.id,
-                        //      contact: data.alternate_phone_number
-                        //    },
-                        //    notify: {
-                        //      sms: true,
-                        //    //   email: true
-                        //    },
-                        //    reminder_enable: true,
-                        //    notes: {
-                        //      policy_name: "Jeevan Bima"
-                        //    },
-                        //    callback_url: "https://example-callback-url.com/",
-                        //    callback_method: "get"
-                        //  })
-
-
-
-
-
-
-
-
+                        const session =  stripe.checkout.sessions.create({
+                           payment_method_types: ['card'],
+                           
+                           line_items: [{
+                           "price_data": {
+                           "currency": "inr",
+                           "product_data": {
+                           "name": 'product.id',
+                           "description": 'product.product_type'
+                           },
+                           "unit_amount": '100'
+                           },
+                           "quantity": 1
+                           }],
+                           phone_number_collection: {
+                           enabled: true,
+                           },
+                           mode: 'payment',
+                           success_url: `https://localhost:3000`,
+                           cancel_url: `https://localhost:3000`
+                           })
+                           .then((result)=>res.send(result))
+                           
+                           ;
 
                      }
-
-                     else {
-                        res.send("check order status");
-                     }
-                     
-
 
                   })
                   .catch((err)=>{
