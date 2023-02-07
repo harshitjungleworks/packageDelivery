@@ -6,6 +6,8 @@ const Product = require('../models/products');
 const Driver = require('../models/drivers');
 const Coupon = require('../models/coupons');
 const { LOADIPHLPAPI } = require('dns');
+let plivo = require('plivo');
+let client = new plivo.Client();
 let  SK = "sk_test_51MXNOPSCt2duW6ZAJkbJ42iyqrhZbj7gIvQyjN2pVLh7gvbAXXyigOungR0fHwSstjNKTY83Xpi8IJNxT5DbGtsk00x8m9VWh9"
 const stripe = require('stripe')(SK);
 
@@ -196,9 +198,13 @@ exports.modifyProductStatus = (req,res)=>{
                         Coupon.getCoupon(detail.coupon)
                         .then(([coupon_detail,mm])=>{
                            // console.log(coupon_detail[0].discount);
+                           // console.log(100 - Number(coupon_detail[0].discount));
                            cost = (cost * (100 - Number(coupon_detail[0].discount)))/100;
+                        //   console.log(cost);
                            Product.setCost(cost,order_id)
-                           .then(()=>{res.status(200).send("ORDER PLACED coupon used")})
+                           .then(()=>{
+                              res.status(200).send("ORDER PLACED coupon used")
+                           })
                            .catch(()=>{res.status(400).send('UNABLE TO SET COST to db')})
                           
                            // console.log('cost :', cost);
@@ -212,7 +218,19 @@ exports.modifyProductStatus = (req,res)=>{
                         .then(()=>{res.status(200).send("ORDER PLACED")})
                         .catch(()=>{res.status(400).send('UNABLE TO SET COST to db')})
                        }
-                     
+
+                       client.messages.create({
+                        src: '+919877319473',
+                        dst: "+91"+`${detail.alternate_phone_number}`,
+                        text: `Hello  your tracking id is ${detail.tracking_id} status has been updated please check order status using this`
+                     })
+                     .then(function(message_created) {
+                    console.log(message_created)
+                    
+                })
+                .catch(err=>console.log(err));
+
+
                      })
                  
                      
@@ -309,7 +327,20 @@ exports.generateLink = (req,res)=>{
                            success_url: `https://localhost:3000`,
                            cancel_url: `https://localhost:3000`
                            })
-                           .then((result)=>res.send(result))
+                           .then((result)=>{
+                              res.status(200).json(result);
+                              console.log(result.url);
+                              client.messages.create({
+                                 src: '+919877319473',
+                                 dst: "+91"+`${data.alternate_phone_number}`,
+                                 text: `Hello  your order with tracking id  ${data.tracking_id} payment link is:${result.url}`
+                              })
+                              .then(function(message_created) {
+                             console.log(message_created)
+                             
+                         })
+                         .catch(err=>console.log(err));
+                           })
                            .catch((err)=>{res.send('unbale to make payment or',err)});
                            
                            ;
