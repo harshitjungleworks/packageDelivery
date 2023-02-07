@@ -4,9 +4,12 @@ const db = require('../util/database');
 const jwt = require('jsonwebtoken');
 const Product = require('../models/products');
 const Driver = require('../models/drivers');
+const Coupon = require('../models/coupons');
 const { LOADIPHLPAPI } = require('dns');
 let  SK = "sk_test_51MXNOPSCt2duW6ZAJkbJ42iyqrhZbj7gIvQyjN2pVLh7gvbAXXyigOungR0fHwSstjNKTY83Xpi8IJNxT5DbGtsk00x8m9VWh9"
 const stripe = require('stripe')(SK);
+
+
 
 
 exports.getAllProductsList = (req,res)=>{
@@ -95,7 +98,7 @@ exports.modifyProductStatus = (req,res)=>{
    User.getRecordByPhoneNumber(phone_number)
    .then(  ([data,metaData])=>{
       data = data[data.length-1]; // getting object 
-      console.log(data);
+      // console.log(data);
       if (data.Designation === 'VERIFIED ADMIN'){
 
 
@@ -119,7 +122,7 @@ exports.modifyProductStatus = (req,res)=>{
       // check if free  deivers 
       Driver.getFreeDrivers()
       .then( ([driverData,md])=>{
-         console.log(driverData);
+         // console.log(driverData);
 
          if (driverData.length === 0){
             res.status(400).send('No free Drivers');
@@ -159,7 +162,7 @@ exports.modifyProductStatus = (req,res)=>{
                   driver_id = element.id;
                }
              });
-            console.log(driver_id);
+            // console.log(driver_id);
 
            
 
@@ -176,16 +179,42 @@ exports.modifyProductStatus = (req,res)=>{
             
              Driver.setTrackingId(tracking_id,driver_id)
              .then(()=>{
+               // console.log('1');
                Driver.setStatus ('OUT',driver_id)
                .then(([a,b])=>{ 
-                  console.log(a);
-                   
+                  // console.log(a);
+                  // console.log('2');
                   Product.setStatus ('OUT',order_id)
                   .then(()=>{
-                     let cost = 100 ;
-                     Product.setCost(cost,order_id)
-                     .then(()=>{res.status(200).send("ORDER PLACED")})
-                     .catch(()=>{res.status(400).send('UNABLE TO SET COST to db')})
+                     Product.getRecordByOrderId(order_id)
+                     .then(([detail,md])=>{
+                        
+                        detail = detail[0];
+                        console.log(detail);
+                        let cost = 100+ Number(detail.weight)*(Number(detail.length)+Number(detail.breadth));
+                       if (detail.coupon != null){ 
+                        Coupon.getCoupon(detail.coupon)
+                        .then(([coupon_detail,mm])=>{
+                           // console.log(coupon_detail[0].discount);
+                           cost = (cost * (100 - Number(coupon_detail[0].discount)))/100;
+                           Product.setCost(cost,order_id)
+                           .then(()=>{res.status(200).send("ORDER PLACED coupon used")})
+                           .catch(()=>{res.status(400).send('UNABLE TO SET COST to db')})
+                          
+                           // console.log('cost :', cost);
+                        })
+                        .catch((err) => {res.send('coupon doesnt exist or',err)})
+                  
+                       }
+                    
+                     else {
+                        Product.setCost(cost,order_id)
+                        .then(()=>{res.status(200).send("ORDER PLACED")})
+                        .catch(()=>{res.status(400).send('UNABLE TO SET COST to db')})
+                       }
+                     
+                     })
+                 
                      
                })
                   .catch(err=>console.log(err))
@@ -254,7 +283,7 @@ exports.generateLink = (req,res)=>{
                   Product.getRecordByOrderId(order_id)
                   .then(([data,md])=>{
                      data = data[0];
-                     // console.log(data);
+                     console.log(data);
                      // console.log(data.c_status);
                      if (data.c_status == 'payment pending'){
                         // console.log('generating payment limk.....');
@@ -266,10 +295,10 @@ exports.generateLink = (req,res)=>{
                            "price_data": {
                            "currency": "inr",
                            "product_data": {
-                           "name": 'product.id',
-                           "description": 'product.product_type'
+                           "name": `Tracking ID : ${data.tracking_id}`,
+                           "description": 'is the cost of Delivery.'
                            },
-                           "unit_amount": '100'
+                           "unit_amount": data.cost * 100,
                            },
                            "quantity": 1
                            }],
@@ -281,6 +310,7 @@ exports.generateLink = (req,res)=>{
                            cancel_url: `https://localhost:3000`
                            })
                            .then((result)=>res.send(result))
+                           .catch((err)=>{res.send('unbale to make payment or',err)});
                            
                            ;
 

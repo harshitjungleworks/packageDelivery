@@ -35,8 +35,10 @@ exports.addProduct= (req,res)=>{
         
    let status = "pending";
    let customer_id = data.id;
+
+   // console.log("value of coupon is ", req.body.coupon);
 // console.log(null,req.body.type,req.body.weight,req.body.length,req.body.breadth,req.body.picture,req.body.pickup_address,req.body.drop_address,req.body.alternate_phone_number,status,customer_id);
-   const product = new Product(null,req.body.type,req.body.weight,req.body.length,req.body.breadth,req.body.picture,req.body.pickup_address,req.body.drop_address,req.body.alternate_phone_number,status,customer_id);
+   const product = new Product(null,req.body.type,req.body.weight,req.body.length,req.body.breadth,req.body.picture,req.body.pickup_address,req.body.drop_address,req.body.alternate_phone_number,status,customer_id,req.body.coupon);
 product.save()
 .then(()=>{result => console.log(result)
    res.statusCode = 200;
@@ -104,6 +106,7 @@ exports.getOrdersList = (req,res)=>{
 
 }
 
+//:::::::::DO
 
 exports.getLocation = (req,res)=>{
    let tracking_id = req.body.tracking_id;

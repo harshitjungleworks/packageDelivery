@@ -3,7 +3,7 @@ const db = require('../util/database');
 module.exports = class Product {
 //     type, weight, length, breadth, picture, pickup_address,
 // drop_address, alternate_phone_number.
-    constructor(id,type,weight,length,breadth,picture,pickup_address,drop_address,alternate_phone_number,c_status,customer_id){
+    constructor(id,type,weight,length,breadth,picture,pickup_address,drop_address,alternate_phone_number,c_status,customer_id,coupon){
         this.id = id;
         this.type = type;
         this.weight = weight;
@@ -15,6 +15,7 @@ module.exports = class Product {
         this.alternate_phone_number = alternate_phone_number;
         this.c_status = c_status;
         this.customer_id = customer_id;
+        this.coupon = coupon;
     }
 
     static fetchAll(){
@@ -22,9 +23,9 @@ module.exports = class Product {
     }
 
     save(){
-console.log(this.type,this.weight,this.length,this.breadth,this.picture,this.pickup_address,this.drop_address,this.alternate_phone_number,this.c_status,this.customer_id);
+// console.log(this.type,this.weight,this.length,this.breadth,this.picture,this.pickup_address,this.drop_address,this.alternate_phone_number,this.c_status,this.customer_id);
 // console.log();
-        return db.execute('INSERT INTO products (type,weight,length,breadth,picture,pickup_address,drop_address,alternate_phone_number,c_status,customer_id) VALUES (?, ?, ?, ? , ? ,? ,? ,?,?,?)',
+        return db.execute('INSERT INTO products (type,weight,length,breadth,picture,pickup_address,drop_address,alternate_phone_number,c_status,customer_id,coupon) VALUES (?, ?, ?, ? , ? ,? ,? ,?,?,?,?)',
         [ this.type,
             this.weight,
             this.length,
@@ -34,7 +35,9 @@ console.log(this.type,this.weight,this.length,this.breadth,this.picture,this.pic
             this.drop_address,
             this.alternate_phone_number,
             this.c_status,
-            this.customer_id]);
+            this.customer_id,
+            this.coupon 
+        ]);
     }
 
     static getRecordByCustomerId( id ){
