@@ -80,4 +80,8 @@ module.exports = class Product {
     static getRecordByDriverId(driver_id){
         return db.execute(`SELECT * FROM products WHERE driver_id = ${driver_id} AND c_status = 'OUT'`)
     }
+
+    static setStatusByTrackingId(tracking_id){
+        return db.execute(`UPDATE products SET c_status = 'completed' WHERE tracking_id=${tracking_id}`)
+    }
 }

@@ -324,8 +324,8 @@ exports.generateLink = (req,res)=>{
                            enabled: true,
                            },
                            mode: 'payment',
-                           success_url: `https://localhost:3000`,
-                           cancel_url: `https://localhost:3000`
+                           success_url: `http://localhost:3000/s/${data.tracking_id}`,
+                           cancel_url: `http://localhost:3000`
                            })
                            .then((result)=>{
                               res.status(200).json(result);
