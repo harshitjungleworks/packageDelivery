@@ -98,6 +98,9 @@ exports.getOrdersList = (req,res)=>{
         })
 
                 }
+                else {
+                  res.status(200).send('not a verified user or expired')
+                }
              })
              .catch(err=>{
                res.statusCode = 400;

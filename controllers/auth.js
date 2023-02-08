@@ -150,7 +150,7 @@ exports.postLogin = (req , res)=>{
     User.updateOtp(phoneNumber,code)
     .then(()=>{
         // console.log(code);
-        res.status(200).send('otp_sent')})
+        res.status(200).send({'otp_sent':code})})
     .catch(err=>{res.send(err)})
     
 }
