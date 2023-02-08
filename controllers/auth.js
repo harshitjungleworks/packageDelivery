@@ -55,8 +55,6 @@ user.save().then(()=>{console.log(" user added")}).catch(err=>console.log(err))
 }
 
 
-
-
 exports.postVerify= (req,res)=>{
 // console.log(req.body);
 // console.log("bevbek");
@@ -131,14 +129,58 @@ exports.postVerify= (req,res)=>{
 
 }
 
+
 /// designation verified user 
 
 exports.postLogin = (req , res)=>{
-    let user_id=  req.body.id;
-    let password = req.body.password;
+    let phoneNumber = req.body.phoneNumber;
 
-    User.check(user_id,password)
-    .then(()=>{res.status(200).send('LOGGED IN')})
-    .catch(err => console.log(err))
-    ;
+    let code = Math.floor(100000 + Math.random() * 900000); // otp 
+    client.messages.create({
+            src: '+919877319473',
+            dst: "+91"+`${req.body.phoneNumber}`,
+            text: `Hello, your 6 digit otp verification code for login is ${code}`
+        }
+    ).then(function(message_created) {
+        console.log(message_created)
+        
+    })
+    .catch(err=>console.log(err));
+
+    User.updateOtp(phoneNumber,code)
+    .then(()=>{
+        // console.log(code);
+        res.status(200).send('otp_sent')})
+    .catch(err=>{res.send(err)})
+    
 }
+
+exports.postLoginVerify = (req , res)=>{
+//    console.log("boilbfcbdolrbrolbv");
+let phoneNumber = req.body.phoneNumber;
+let otp = req.body.otp;
+        User.getRecordByPhoneNumber(phoneNumber)
+        .then(([data,md])=>{
+            // console.log(data);
+
+         if (data[0].Designation.includes('VERIFIED')){  
+            
+            
+            if (data[0].OTP == otp){
+                const token = jwt.sign({PhoneNumber:phoneNumber},
+                'secret',{expiresIn:'9h'});
+                res.status(200).send({token:token});
+            }
+
+            else {
+                res.status(400).send('otp didnt match');
+            }
+
+            }
+                else {
+                    res.status(400).send('user not verified');
+                }
+
+        })
+        .catch(err => console.log(err))
+    }

@@ -346,6 +346,9 @@ exports.generateLink = (req,res)=>{
                            ;
 
                      }
+                     else {
+                        res.status(400).send('check order status probably not in paymnet pending')
+                     }
 
                   })
                   .catch((err)=>{

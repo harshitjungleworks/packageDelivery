@@ -13,5 +13,7 @@ router.post('/verify',authController.postVerify);
 
 router.post('/login',authController.postLogin);
 
+router.post('/loginverify',authController.postLoginVerify)
+
 
 module.exports = router;

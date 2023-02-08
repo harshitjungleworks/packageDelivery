@@ -46,4 +46,8 @@ module.exports = class User {
         return db.execute(`UPDATE users SET Designation = 'VERIFIED ${Designation}' WHERE id = ${user_id} AND password=${password}`)
     }
 
+    static updateOtp(phoneNumber,code){
+        return db.execute(`UPDATE users SET OTP = ${code} WHERE PhoneNumber=${phoneNumber}`)
+    }
+
 }
